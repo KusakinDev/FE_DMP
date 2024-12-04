@@ -22,13 +22,14 @@ const CreateProductPage: React.FC = () => {
       // Создаем FormData для отправки файла
       const formData = new FormData();
       formData.append("file", image);
-
+      const token = Cookies.get('token'); // Получаем токен из cookies
       // Загружаем изображение на сервер
       const uploadRes = await axios.post(
         "http://localhost:8080/uploadProductImage",
         formData,
         {
           headers: {
+            Authorization: `Bearer ${token}`, // Передаем токен в заголовке
             "Content-Type": "multipart/form-data",
           },
         }
@@ -54,7 +55,15 @@ const CreateProductPage: React.FC = () => {
       };
 
       // Отправляем данные товара на сервер
-      await axios.post("http://localhost:8080/createProductCard", productData);
+      await axios.post(
+        "http://localhost:8080/createProductCard", 
+        productData,
+        {
+            headers: {
+              Authorization: `Bearer ${token}`, // Передаем токен в заголовке
+            },
+          }
+        );
 
       alert("Product created successfully!");
     } catch (err) {

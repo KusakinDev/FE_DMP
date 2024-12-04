@@ -20,8 +20,14 @@ const LoginPage = () => {
       
       if (response.status === 200) {
         const token = response.data.token; // Предполагается, что сервер возвращает токен в поле 'token'
+        let id = response.data.id;
+
+        console.log(' id:', id); // Выводим токен в консоль
         console.log('JWT Token:', token); // Выводим токен в консоль
+        
         Cookies.set('token', token, { expires: 7, sameSite: 'Strict' });
+        Cookies.set('id', id);
+
         router.push('/pages/feed'); // Переход на другое окно (страницу)
       }
     } catch (error) {

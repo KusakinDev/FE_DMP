@@ -1,33 +1,51 @@
-import React from 'react';
+"use client";
+
+import React, { useEffect, useState } from 'react';
 import ProductCard from '@/components/ProductCard';
 import { Product } from '@/types/Product';
-import axios from 'axios'; 
-import { cookies } from 'next/headers';
+import axios from 'axios';
+import Cookies from 'js-cookie'; // Импортируем библиотеку для работы с cookies
 
-const FeedPage = async () => {
-  const cookieStore = await cookies(); // Получаем куки
-  const token = cookieStore.get('token')?.value; // Извлекаем JWT токен из куки
+const FeedPage = () => {
+  const [products, setProducts] = useState<Product[]>([]); // Состояние для хранения продуктов
+  const [loading, setLoading] = useState(true); // Состояние для загрузки
+  const [error, setError] = useState<string | null>(null); // Состояние для ошибки
 
-  // Логируем токен для проверки
-  console.log('JWT Token:', token);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const token = Cookies.get('token'); // Получаем токен из cookies
 
-  let products: Product[] = [];
-  if (!token) {
-    console.error('No JWT token found in cookies');
-  } else {
-    try {
-      // Выполняем запрос через axios
-      const response = await axios.get('http://localhost:8080/getAllFeed', {
-        headers: {
-          Authorization: `Bearer ${token}`, // Передаем токен в заголовке
-        },
-      });
+      if (!token) {
+        setError('No JWT token found in cookies');
+        setLoading(false);
+        return;
+      }
 
-      // Если запрос успешен, получаем данные
-      products = response.data; 
-    } catch (error) {
-      console.error('Error fetching products:', error.response?.data || error.message); // Логируем ошибку
-    }
+      try {
+        const response = await axios.get('http://localhost:8080/getAllFeed', {
+          headers: {
+            Authorization: `Bearer ${token}`, // Передаем токен в заголовке
+          },
+        });
+
+        setProducts(response.data); // Получаем продукты из ответа
+      } catch (err) {
+        setError('Error fetching products');
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []); // Эффект выполняется только один раз при монтировании компонента
+
+  if (loading) {
+    return <div>Loading...</div>; // Показываем "Загрузка", пока данные не загружены
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>; // Показываем ошибку, если она произошла
   }
 
   return (

@@ -9,4 +9,5 @@ export interface Product {
   date_pub: string;
   date_buy?: string | null; // date_buy может быть null
   is_buy: boolean;
+  image: string;
 }

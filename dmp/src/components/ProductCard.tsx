@@ -10,7 +10,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   };
 
   return (
-    <div className="bg-white border rounded-lg shadow-md p-4 relative pb-16">
+    <div className="bg-PastelBlue rounded-lg shadow-md p-4 relative pb-16">
       {/* Изображение товара */}
       <img
         src={product.image} // Предполагаем, что product.image содержит ссылку на изображение из Cloudinary
@@ -18,15 +18,18 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
         className="w-full h-48 object-cover rounded-lg mb-4"
       />
       
-      <h3 className="text-gray-700 font-semibold mt-2">{product.title}</h3>
-      <p className="text-gray-600 mt-1">{product.description}</p>
+      <h3 className="text-DarkOceanBlue font-semibold mt-2">{product.title}</h3>
+      <p className="text-DarkOceanBlue mt-1">{product.description}</p>
 
       {/* Кнопка в левом нижнем углу */}
       <button
-        className={`absolute left-4 bottom-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 ${addedToCart ? 'bg-green-500 hover:bg-green-600' : ''}`}
+        className={`absolute left-4 bottom-4 text-GoldenYellow px-4 py-2 rounded bg-DarkSlateBlue hover:bg-DeepTealBlue ${addedToCart ? 'text-CharcoalGray bg-MintGreen hover:bg-EmeraldGreen' : ''}`}
         onClick={handleAddToCart}
       >
-        {addedToCart ? 'Добавленно в корзину' : `Купить: ${product.price} ETH`} {/* Меняем текст в зависимости от состояния */}
+        {addedToCart ? 'Добавленно в корзину' : `Купить: ${Number(product.price.toFixed(9)).toLocaleString("en", { 
+          useGrouping: false, 
+          maximumFractionDigits: 9 
+        })} ETH`} {/* Меняем текст в зависимости от состояния */}
       </button>
 
       {/* Дата публикации в правом нижнем углу */}

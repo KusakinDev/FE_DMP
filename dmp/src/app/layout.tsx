@@ -1,9 +1,9 @@
-// src/app/layout.tsx
-import Header from "@/components/header";  // Импортируем Header
-import "./globals.css";  // Глобальные стили
+import Header from "@/components/header";
+import "./globals.css";
+import JwtRefresher from "@/components/JWTrefresher"; // Импортируем клиентский компонент
 
 export const metadata = {
-  title: "Alexander's Digital markerplace",
+  title: "Alexander's Digital marketplace",
   description: "Лучшие цифровые товары",
 };
 
@@ -15,10 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <Header />  {/* Вставляем Header в layout */}
-        <main className="pt-20"> {/* Добавляем отступ сверху для основного контента */}
-          {children}
-        </main>
+        <JwtRefresher /> {/* Клиентский компонент для работы с токеном */}
+        <Header />
+        <main>{children}</main>
       </body>
     </html>
   );

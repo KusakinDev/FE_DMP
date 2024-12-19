@@ -3,12 +3,14 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie"; // Импортируем библиотеку для работы с cookies
+import { useRouter } from 'next/navigation';
 
 const CreateProductPage: React.FC = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number | "">("");
   const [image, setImage] = useState<File | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +27,7 @@ const CreateProductPage: React.FC = () => {
       const token = Cookies.get('token'); // Получаем токен из cookies
       // Загружаем изображение на сервер
       const uploadRes = await axios.post(
-        "http://localhost:8080/uploadProductImage",
+        "http://localhost:8080/protected/uploadProductImage",
         formData,
         {
           headers: {
@@ -37,17 +39,10 @@ const CreateProductPage: React.FC = () => {
 
       const imageUrl = uploadRes.data.url; // Предполагаем, что сервер вернет объект { url: "https://..." }
 
-      // Получаем id из cookies
-      const id = Cookies.get('id'); // Получаем id из cookies
 
-      if (!id) {
-        alert("User ID not found in cookies.");
-        return;
-      }
 
       // Формируем JSON с данными товара
       const productData = {
-        id_s: Number(id),
         title,
         description,
         price: Number(price),
@@ -56,7 +51,7 @@ const CreateProductPage: React.FC = () => {
 
       // Отправляем данные товара на сервер
       await axios.post(
-        "http://localhost:8080/createProductCard", 
+        "http://localhost:8080/protected/createProductCard", 
         productData,
         {
             headers: {
@@ -66,6 +61,7 @@ const CreateProductPage: React.FC = () => {
         );
 
       alert("Product created successfully!");
+      router.push('/pages/feed');
     } catch (err) {
       console.error("Error creating product:", err);
       alert("Failed to create product.");
@@ -73,17 +69,17 @@ const CreateProductPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="min-h-screen bg-LightIceBlue flex items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg shadow-md w-full max-w-md"
+        className="bg-PastelBlue p-6 rounded-lg shadow-md w-full max-w-md"
       >
-        <h1 className="text-2xl font-bold mb-4">Create Product</h1>
+        <h1 className="text-DarkOceanBlue text-2xl font-bold mb-4">Новый товар</h1>
 
         {/* Title */}
         <div className="mb-4">
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-            Title
+          <label htmlFor="title" className="block text-sm font-medium text-DarkOceanBlue">
+            Название
           </label>
           <input
             type="text"
@@ -91,7 +87,7 @@ const CreateProductPage: React.FC = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            className="mt-1 p-2 w-full border rounded-lg"
+            className="text-DarkAquamarine bg-LightIceBlue mt-1 p-2 w-full rounded-lg"
           />
         </div>
 
@@ -99,38 +95,46 @@ const CreateProductPage: React.FC = () => {
         <div className="mb-4">
           <label
             htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-DarkOceanBlue"
           >
-            Description
+            Описание
           </label>
           <textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
-            className="mt-1 p-2 w-full border rounded-lg"
+            className="text-DarkAquamarine bg-LightIceBlue mt-1 p-2 w-full rounded-lg"
           />
         </div>
 
         {/* Price */}
         <div className="mb-4">
-          <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-            Price
+          <label htmlFor="price" className="block text-sm font-medium text-DarkOceanBlue">
+            Цена
           </label>
-          <input
-            type="number"
-            id="price"
-            value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
-            required
-            className="mt-1 p-2 w-full border rounded-lg"
-          />
+          <div className="relative mt-1 w-full">
+            <input
+              type="number"
+              id="price"
+              value={price === "" ? "" : Number(price).toFixed(9)}
+              onChange={(e) => setPrice(Number(e.target.value))}
+              required
+              className="text-DarkAquamarine bg-LightIceBlue p-2 w-full pl-16 rounded-lg focus:ring-2 focus:ring-DarkAquamarine outline-none"
+              placeholder="0.0"
+              min="0"
+              step="0.000000001" // Подходит для работы с дробными числами
+            />
+            <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-DarkAquamarine font-semibold">
+              ETH
+            </div>
+          </div>
         </div>
 
         {/* Image */}
         <div className="mb-4">
-          <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-            Upload Image
+          <label htmlFor="image" className="block text-sm font-medium text-DarkOceanBlue  ">
+            Загрузить фото товара
           </label>
           <input
             type="file"
@@ -145,9 +149,9 @@ const CreateProductPage: React.FC = () => {
         {/* Submit Button */}
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+          className="bg-DarkSlateBlue hover:bg-DeepTealBlue text-white px-4 py-2 rounded-lg"
         >
-          Create Product
+          Создать (отправить на модерацию)
         </button>
       </form>
     </div>

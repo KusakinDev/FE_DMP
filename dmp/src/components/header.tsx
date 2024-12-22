@@ -1,11 +1,9 @@
-// src/components/Header.tsx
 "use client";  // Эта директива сообщает Next.js, что компонент должен рендериться на клиенте
 
 import React, { useState } from "react";
-import { FaSearch, FaShoppingCart } from "react-icons/fa";  // Иконки из react-icons
+import { FaSearch, FaShoppingCart, FaUserCircle } from "react-icons/fa";  // Иконки из react-icons
 import { useRouter } from 'next/navigation';
 import Link from "next/link"; // Для навигации между страницами
-
 
 const Header: React.FC = () => {
   const router = useRouter();
@@ -14,12 +12,18 @@ const Header: React.FC = () => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
+
   const sellGoods = async () => {
     router.push('/pages/createProductCard');
-  }
+  };
+
   const toCart = async () => {
     router.push('/pages/cart');
-  }
+  };
+
+  const toProfile = async () => {
+    router.push('/pages/profile'); // Переход на страницу профиля
+  };
 
   return (
     <header className="bg-DarkSlateBlue text-white py-4 sticky top-0 left-0 w-full z-10 shadow-md">
@@ -27,11 +31,9 @@ const Header: React.FC = () => {
         <div className="flex items-center space-x-3">
           <Link href="/pages/feed" className="flex items-center space-x-3">
             <img src="/logo.png" alt="Logo" className="h-8 w-8" />
-            <h1 className="text-xl font-semibold">Alexander's Digital markerplace</h1>
+            <h1 className="text-xl font-semibold">Alexander's Digital Marketplace</h1>
           </Link>
         </div>
-
-        
 
         <div className="flex items-center space-x-2">
           <input
@@ -41,7 +43,6 @@ const Header: React.FC = () => {
             placeholder="Search..."
             className="p-2 rounded-lg w-64 bg-gray-700 text-white focus:outline-none"
           />
-      
           <button className="p-2 rounded-lg bg-gray-600 text-white hover:bg-gray-500">
             <FaSearch />
           </button>
@@ -55,9 +56,11 @@ const Header: React.FC = () => {
         </button>
 
         <div className="flex items-center space-x-4">
-          <button className="text-white hover:text-gray-300"
-            onClick={toCart}>
+          <button className="text-white hover:text-gray-300" onClick={toCart}>
             <FaShoppingCart size={24} />
+          </button>
+          <button className="text-white hover:text-gray-300" onClick={toProfile}>
+            <FaUserCircle size={24} />
           </button>
         </div>
       </div>

@@ -11,6 +11,8 @@ const CreateProductPage: React.FC = () => {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number | "">("");
   const [image, setImage] = useState<File | null>(null);
+  const [inputType, setInputType] = useState("password");
+  const [inputValue, setInputValue] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,21 +38,28 @@ const CreateProductPage: React.FC = () => {
           },
         }
       );
+      const imageUrl = uploadRes.data.url;
 
-      const imageUrl = uploadRes.data.url; // Предполагаем, что сервер вернет объект { url: "https://..." }
-
-
-
+      const saveRes = await axios.post(`${API_URL}/protected/createItem`,
+        {content: inputValue},
+        {
+            headers: {
+              Authorization: `Bearer ${token}`, // Передаем токен в заголовке
+            },
+          }
+        );
+      const id_i = saveRes.data.id;
       // Формируем JSON с данными товара
       const productData = {
         title,
         description,
         price: Number(price),
         image: imageUrl, // Ссылка на загруженное изображение
+        id_i: Number(id_i),
       };
 
       // Отправляем данные товара на сервер
-      await axios.post(`${API_URL}/protected/createProductCard`, 
+      await axios.post(`${API_URL}/protected/createProductCard`,
         productData,
         {
             headers: {
@@ -67,11 +76,15 @@ const CreateProductPage: React.FC = () => {
     }
   };
 
+  const toggleInputType = () => {
+    setInputType(inputType === "password" ? "text" : "password");
+  };
+
   return (
-    <div className="min-h-screen bg-LightIceBlue flex items-center justify-center">
+    <div className="min-h-screen bg-LightIceBlue flex flex-col items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className="bg-PastelBlue p-6 rounded-lg shadow-md w-full max-w-md"
+        className="bg-PastelBlue p-6 rounded-lg shadow-md w-full max-w-md mb-8"
       >
         <h1 className="text-DarkOceanBlue text-2xl font-bold mb-4">Новый товар</h1>
 
@@ -150,9 +163,35 @@ const CreateProductPage: React.FC = () => {
           type="submit"
           className="bg-DarkSlateBlue hover:bg-DeepTealBlue text-white px-4 py-2 rounded-lg"
         >
-          Создать (отправить на модерацию)
+          Создать
         </button>
       </form>
+
+      {/* Новая карточка */}
+      <div className="bg-PastelBlue p-6 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-DarkOceanBlue text-xl font-bold mb-4">Ключ</h2>
+        <div className="mb-4">
+          <label htmlFor="additionalInput" className="block text-sm font-medium text-DarkOceanBlue">
+            Ключ хранится в зашифрованном виде
+          </label>
+          <div className="relative mt-1 w-full">
+            <input
+              type={inputType}
+              id="additionalInput"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="text-DarkAquamarine bg-LightIceBlue p-2 w-full rounded-lg"
+            />
+            <button
+              type="button"
+              onClick={toggleInputType}
+              className="absolute inset-y-0 right-0 flex items-center px-4 text-xl text-DarkAquamarine"
+            >
+              {inputType === "password" ? "★" : "☆"}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

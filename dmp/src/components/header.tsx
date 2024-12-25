@@ -1,9 +1,11 @@
 "use client";  // Эта директива сообщает Next.js, что компонент должен рендериться на клиенте
 
 import React, { useState } from "react";
-import { FaSearch, FaShoppingCart, FaUserCircle } from "react-icons/fa";  // Иконки из react-icons
+import { FaSearch, FaShoppingCart, FaSign, FaSignOutAlt, FaUserCircle } from "react-icons/fa";  // Иконки из react-icons
 import { useRouter } from 'next/navigation';
 import Link from "next/link"; // Для навигации между страницами
+import { FaPlus } from "react-icons/fa6";
+import Cookies from "js-cookie";
 
 const Header: React.FC = () => {
   const router = useRouter();
@@ -23,6 +25,12 @@ const Header: React.FC = () => {
 
   const toProfile = async () => {
     router.push('/pages/profile'); // Переход на страницу профиля
+  };
+
+  const toLogIn = async () => {
+    router.push('/'); // Переход на страницу профиля
+    Cookies.remove('token');
+    localStorage.clear();
   };
 
   return (
@@ -48,19 +56,18 @@ const Header: React.FC = () => {
           </button>
         </div>
 
-        <button
-          onClick={sellGoods}
-          className="bg-gray-700 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Продать товар
-        </button>
-
         <div className="flex items-center space-x-4">
-          <button className="text-white hover:text-gray-300" onClick={toCart}>
+          <button className="text-white hover:text-LightIceBlue" onClick={sellGoods}>
+            <FaPlus size={24} />
+          </button>
+          <button className="text-white hover:text-LightIceBlue" onClick={toCart}>
             <FaShoppingCart size={24} />
           </button>
-          <button className="text-white hover:text-gray-300" onClick={toProfile}>
+          <button className="text-white hover:text-LightIceBlue" onClick={toProfile}>
             <FaUserCircle size={24} />
+          </button>
+          <button className="text-white hover:text-LightIceBlue" onClick={toLogIn}>
+            <FaSignOutAlt size={24} />
           </button>
         </div>
       </div>

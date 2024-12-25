@@ -54,6 +54,12 @@ const CartPage = () => {
     // Здесь также можно отправить запрос на сервер для обновления корзины
   };
 
+  const itemsToBuy = cartItems.filter((product) => !product.is_buy);
+  const itemsBought = cartItems.filter((product) => product.is_buy);
+
+  const updateCart = async () => {
+    await fetchCartItems(); // Повторное получение товаров
+  };
   return (
     <div className="min-h-screen bg-LightIceBlue py-8">
       <h1 className="text-3xl font-bold text-center text-DarkAquamarine mb-8">
@@ -69,21 +75,42 @@ const CartPage = () => {
       {error && <p className="text-center text-red-500">Ошибка: {error}</p>}
 
       {/* Отображение товаров в корзине */}
-      {!loading && !error && Array.isArray(cartItems) && cartItems.length > 0 && (
-        <div className="max-w-5xl mx-auto flex flex-col space-y-4 px-4">
-          {cartItems.map((product) => (
-            <CartProductCard
-              key={product.id}
-              product={product}
-              onRemove={handleRemoveFromCart} // Передаем функцию удаления
-            />
-          ))}
-        </div>
-      )}
+      {!loading && !error && (
+        <>
+          {itemsToBuy.length > 0 && (
+            <div className="max-w-5xl mx-auto flex flex-col space-y-4 px-4">
+              {itemsToBuy.map((product) => (
+                <CartProductCard
+                  key={product.id}
+                  product={product}
+                  onRemove={handleRemoveFromCart} // Передаем функцию удаления
+                  onUpdate={updateCart}
+                />
+              ))}
+            </div>
+          )}
+          
+          {itemsBought.length > 0 && (
+            <>
+              <div className="max-w-5xl mx-auto flex flex-col space-y-4 px-4">
+                <hr className="mt-5 mb-1 border-t border-DarkOceanBlue w-full" />
+                {itemsBought.map((product) => ( 
+                  <CartProductCard
+                    key={product.id}
+                    product={product}
+                    onRemove={handleRemoveFromCart} // Передаем функцию удаления
+                    onUpdate={updateCart}
+                  />
+                ))}
+              </div>
+            </>
+          )}
 
-      {/* Если корзина пуста */}
-      {!loading && !error && Array.isArray(cartItems) && cartItems.length === 0 && (
-        <p className="text-center text-gray-600">Ваша корзина пуста.</p>
+          {/* Если корзина пуста */}
+          {itemsToBuy.length === 0 && itemsBought.length === 0 && (
+            <p className="text-center text-gray-600">Ваша корзина пуста.</p>
+          )}
+        </>
       )}
     </div>
   );

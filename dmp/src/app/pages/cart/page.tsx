@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Product } from "@/types/Product"; // Предполагаем, что тип Product уже определен в проекте
-import ProductCard from "@/components/ProductCard"; // Импортируем вашу карточку товара
+import CartProductCard from "@/components/CartProductCard"; // Импортируем новую карточку для корзины
 import API_URL from "@/config";
 import Cookies from "js-cookie";
 
@@ -28,12 +28,13 @@ const CartPage = () => {
       }
 
       // Отправка GET-запроса для получения товаров из корзины
-      const response = await axios.get(`${API_URL}/getCart`, {
+      const response = await axios.get(`${API_URL}/protected/getCart`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
+      console.log("Cart items:", response.data);
       // Устанавливаем товары в состояние
       setCartItems(response.data || []); // Защищаем от null/undefined
     } catch (err) {
@@ -55,29 +56,27 @@ const CartPage = () => {
 
   return (
     <div className="min-h-screen bg-LightIceBlue py-8">
-      <h1 className="text-3xl font-bold text-center text-DarkAquamarine mb-8">Корзина</h1>
+      <h1 className="text-3xl font-bold text-center text-DarkAquamarine mb-8">
+        Корзина
+      </h1>
 
       {/* Статус загрузки */}
-      {loading && <p className="text-center text-DarkAquamarine ">Загрузка товаров...</p>}
+      {loading && (
+        <p className="text-center text-DarkAquamarine">Загрузка товаров...</p>
+      )}
 
       {/* Ошибка при загрузке */}
       {error && <p className="text-center text-red-500">Ошибка: {error}</p>}
 
       {/* Отображение товаров в корзине */}
       {!loading && !error && Array.isArray(cartItems) && cartItems.length > 0 && (
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+        <div className="max-w-5xl mx-auto flex flex-col space-y-4 px-4">
           {cartItems.map((product) => (
-            <div key={product.id} className="relative">
-              <ProductCard product={product} />
-
-              {/* Кнопка для удаления товара */}
-              <button
-                onClick={() => handleRemoveFromCart(product.id)}
-                className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
-              >
-                X
-              </button>
-            </div>
+            <CartProductCard
+              key={product.id}
+              product={product}
+              onRemove={handleRemoveFromCart} // Передаем функцию удаления
+            />
           ))}
         </div>
       )}

@@ -1,12 +1,44 @@
 import React, { useState } from 'react';
 import { Product } from '@/types/Product';
+import axios from "axios";
+import Cookies from "js-cookie";
+import API_URL from "@/config";
 
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   const [addedToCart, setAddedToCart] = useState(false); // Состояние для отслеживания добавления в корзину
 
-  const handleAddToCart = () => {
-    // Логика добавления в корзину
-    setAddedToCart(true); // Устанавливаем состояние в true, чтобы показать, что товар добавлен
+  const handleAddToCart = async (productId: number) => {
+    try {
+      const token = Cookies.get("token");
+  
+      if (!token) {
+        console.error("Необходима авторизация.");
+        return;
+      }
+  
+      // Отправка запроса на сервер для добавления в корзину
+      const response = await axios.post(
+        `${API_URL}/protected/addToCart`,
+        { id: productId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        console.log("Товар успешно добавлен в корзину:", response.data);
+        setAddedToCart(true); // Устанавливаем состояние, чтобы показать, что товар добавлен
+      }
+      if (response.status === 208) {
+        console.log("Товар уже добавлен в корзину:", response.data);
+        alert("Товар уже добавлен в корзину!");
+        setAddedToCart(true); // Устанавливаем состояние, чтобы показать, что товар добавлен
+      }
+    } catch (error) {
+      console.error("Ошибка при добавлении товара в корзину:", error);
+    }
   };
 
   return (
@@ -20,11 +52,18 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
       
       <h3 className="text-DarkOceanBlue font-semibold mt-2">{product.title}</h3>
       <p className="text-DarkOceanBlue mt-1">{product.description}</p>
+      <hr className="my-4 border-t border-DarkOceanBlue" />
+      <p className="text-DarkOceanBlue mt-1 text-sm">
+        Продавец: {product.User.name}
+      </p>
+      <p className="text-DarkOceanBlue mt-1 text-sm">
+        ✦{product.User.rating} • {product.User.count_rating} оценок
+      </p>
 
       {/* Кнопка в левом нижнем углу */}
       <button
         className={`absolute left-4 bottom-4 text-GoldenYellow px-4 py-2 rounded bg-DarkSlateBlue hover:bg-DeepTealBlue ${addedToCart ? 'text-CharcoalGray bg-MintGreen hover:bg-EmeraldGreen' : ''}`}
-        onClick={handleAddToCart}
+        onClick={() => handleAddToCart(product.id)}
       >
         {addedToCart ? 'Добавленно в корзину' : `Купить: ${Number(product.price.toFixed(9)).toLocaleString("en", { 
           useGrouping: false, 
@@ -36,6 +75,8 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
       <p className="absolute right-4 bottom-4 text-gray-600 text-sm">
         Дата публикации: {product.date_pub.substring(0, 10)}
       </p>
+      
+      
     </div>
   );
 };

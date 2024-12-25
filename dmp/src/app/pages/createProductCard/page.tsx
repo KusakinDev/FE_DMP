@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie"; // Импортируем библиотеку для работы с cookies
 import { useRouter } from 'next/navigation';
+import API_URL from "@/config";
 
 const CreateProductPage: React.FC = () => {
   const [title, setTitle] = useState("");
@@ -26,8 +27,7 @@ const CreateProductPage: React.FC = () => {
       formData.append("file", image);
       const token = Cookies.get('token'); // Получаем токен из cookies
       // Загружаем изображение на сервер
-      const uploadRes = await axios.post(
-        "http://localhost:8080/protected/uploadProductImage",
+      const uploadRes = await axios.post(`${API_URL}/protected/uploadProductImage`,
         formData,
         {
           headers: {
@@ -50,8 +50,7 @@ const CreateProductPage: React.FC = () => {
       };
 
       // Отправляем данные товара на сервер
-      await axios.post(
-        "http://localhost:8080/protected/createProductCard", 
+      await axios.post(`${API_URL}/protected/createProductCard`, 
         productData,
         {
             headers: {

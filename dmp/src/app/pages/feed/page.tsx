@@ -30,6 +30,7 @@ const FeedPage = () => {
         });
 
         setProducts(response.data); // Получаем продукты из ответа
+        console.log('Products:', response.data);
       } catch (err) {
         setError('Error fetching products');
         console.error('Error fetching products:', err);
